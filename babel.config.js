@@ -1,4 +1,4 @@
-// Needed for jest.
+// Needed for testing React
 module.exports = {
   inputSourceMap: true,
   presets: [
