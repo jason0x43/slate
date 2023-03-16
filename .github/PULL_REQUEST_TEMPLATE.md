@@ -12,8 +12,8 @@ If your change is non-trivial, please include a description of how the new logic
 
 **Checks**
 - [ ] The new code matches the existing patterns and styles.
-- [ ] The tests pass with `yarn test`.
-- [ ] The linter passes with `yarn lint`. (Fix errors with `yarn fix`.)
-- [ ] The relevant examples still work. (Run examples with `yarn start`.)
-- [ ] You've [added a changeset](https://github.com/atlassian/changesets/blob/master/docs/adding-a-changeset.md) if changing functionality. (Add one with `yarn changeset add`.)
+- [ ] The tests pass with `pnpm test`.
+- [ ] The linter passes with `pnpm lint`. (Fix errors with `pnpm fix`.)
+- [ ] The relevant examples still work. (Run examples with `pnpm start`.)
+- [ ] You've [added a changeset](https://github.com/atlassian/changesets/blob/master/docs/adding-a-changeset.md) if changing functionality. (Add one with `pnpm changeset add`.)
 
