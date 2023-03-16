@@ -1,5 +1,5 @@
 import React from 'react'
-import assert from 'assert'
+import { expect } from 'chai'
 import { createEditor, Transforms } from 'slate'
 import { render, act } from '@testing-library/react'
 import { fake } from 'sinon'
@@ -39,11 +39,10 @@ describe('slate-react', () => {
         )
 
         // 3 renders, one for the the original element, then one each for the two split elements
-        assert.equal(
+        expect(
           mounts.callCount,
-          3,
           "component wasn't rendered expected number of times"
-        )
+        ).to.equal(3)
       })
 
       it('should not unmount the node that gets merged into on a merge_node operation', async () => {
@@ -71,12 +70,11 @@ describe('slate-react', () => {
           Transforms.mergeNodes(editor, { at: { path: [0, 0], offset: 0 } })
         )
 
-        // only 2 renders for the initial render
-        assert.equal(
+        // 2 renders, one for the original element, and one after the merge
+        expect(
           mounts.callCount,
-          2,
           "component wasn't rendered expected number of times"
-        )
+        ).to.equal(2)
       })
     })
   })
