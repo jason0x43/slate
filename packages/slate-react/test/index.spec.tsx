@@ -1,12 +1,9 @@
 import React from 'react'
-import { createEditor, Element, Transforms } from 'slate'
-import { create, act, ReactTestRenderer } from 'react-test-renderer'
+import assert from 'assert'
+import { createEditor, Transforms } from 'slate'
+import { render, act } from '@testing-library/react'
+import { fake } from 'sinon'
 import { Slate, withReact, Editable } from '../src'
-
-const createNodeMock = () => ({
-  ownerDocument: global.document,
-  getRootNode: () => global.document,
-})
 
 class MockResizeObserver {
   observe() {}
@@ -19,61 +16,55 @@ describe('slate-react', () => {
 
   describe('Editable', () => {
     describe('NODE_TO_KEY logic', () => {
-      test('should not unmount the node that gets split on a split_node operation', async () => {
+      it('should not unmount the node that gets split on a split_node operation', async () => {
         const editor = withReact(createEditor())
         const value = [{ type: 'block', children: [{ text: 'test' }] }]
-        const mounts = jest.fn<void, [Element]>()
+        const mounts = fake()
 
-        let el: ReactTestRenderer
+        render(
+          <Slate editor={editor} value={value} onChange={() => {}}>
+            <Editable
+              renderElement={({ element, children }) => {
+                React.useEffect(() => mounts(element), [element])
 
-        act(() => {
-          el = create(
-            <Slate editor={editor} value={value} onChange={() => {}}>
-              <Editable
-                renderElement={({ element, children }) => {
-                  React.useEffect(() => mounts(element), [])
-
-                  return children
-                }}
-              />
-            </Slate>,
-            { createNodeMock }
-          )
-        })
+                return children
+              }}
+            />
+          </Slate>
+        )
 
         // slate updates at next tick, so we need this to be async
         await act(async () =>
           Transforms.splitNodes(editor, { at: { path: [0, 0], offset: 2 } })
         )
 
-        // 2 renders, one for the main element and one for the split element
-        expect(mounts).toHaveBeenCalledTimes(2)
+        // 3 renders, one for the the original element, then one each for the two split elements
+        assert.equal(
+          mounts.callCount,
+          3,
+          "component wasn't rendered expected number of times"
+        )
       })
 
-      test('should not unmount the node that gets merged into on a merge_node operation', async () => {
+      it('should not unmount the node that gets merged into on a merge_node operation', async () => {
         const editor = withReact(createEditor())
         const value = [
           { type: 'block', children: [{ text: 'te' }] },
           { type: 'block', children: [{ text: 'st' }] },
         ]
-        const mounts = jest.fn<void, [Element]>()
+        const mounts = fake()
 
-        let el: ReactTestRenderer
+        render(
+          <Slate editor={editor} value={value} onChange={() => {}}>
+            <Editable
+              renderElement={({ element, children }) => {
+                React.useEffect(() => mounts(element), [element])
 
-        act(() => {
-          el = create(
-            <Slate editor={editor} value={value} onChange={() => {}}>
-              <Editable
-                renderElement={({ element, children }) => {
-                  React.useEffect(() => mounts(element), [])
-
-                  return children
-                }}
-              />
-            </Slate>,
-            { createNodeMock }
-          )
-        })
+                return children
+              }}
+            />
+          </Slate>
+        )
 
         // slate updates at next tick, so we need this to be async
         await act(async () =>
@@ -81,7 +72,11 @@ describe('slate-react', () => {
         )
 
         // only 2 renders for the initial render
-        expect(mounts).toHaveBeenCalledTimes(2)
+        assert.equal(
+          mounts.callCount,
+          2,
+          "component wasn't rendered expected number of times"
+        )
       })
     })
   })
